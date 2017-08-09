@@ -1,0 +1,90 @@
+module: lagopus-router
+    +--rw network-instances
+    |  +--rw network-instance* [name]
+    |     +--rw name          -> ../config/name
+    |     +--rw fdb
+    |     |  +--rw config
+    |     |     +--rw mac-learning?      boolean
+    |     |     +--rw mac-aging-time?    uint16
+    |     |     +--rw maximum-entries?   uint16
+    |     +--rw config
+    |     |  +--rw name?                       string
+    |     |  +--rw type?                       oc-ni-types:NETWORK_INSTANCE_TYPE
+    |     |  +--rw enabled?                    boolean
+    |     |  +--rw description?                string
+    |     |  +--rw router-id?                  yang:dotted-quad
+    |     |  +--rw route-distinguisher?        oc-ni-types:route-distinguisher
+    |     |  +--rw enabled-address-families*   octypes:ADDRESS_FAMILY
+    |     |  +--rw mtu?                        uint16
+    |     +--rw interfaces
+    |     |  +--rw interface* [id]
+    |     |     +--rw id        -> ../config/id
+    |     |     +--rw config
+    |     |        +--rw id?                            string
+    |     |        +--rw interface?                     string
+    |     |        +--rw subinterface?                  uint32
+    |     |        +--rw associated-address-families*   oc-types:ADDRESS_FAMILY
+    |     +--rw vlans
+    |        +--rw vlan* [vlan-id]
+    |           +--rw vlan-id    -> ../config/vlan-id
+    |           +--rw config
+    |              +--rw vlan-id?   oc-vlan-types:vlan-id
+    |              +--rw name?      string
+    |              +--rw status?    enumeration
+    +--rw interfaces
+       +--rw interface* [name]
+          +--rw name             -> ../config/name
+          +--rw config
+          |  +--rw type           iana-if-type:iana-if-type
+          |  +--rw mtu?           uint16
+          |  +--rw name?          string
+          |  +--rw description?   string
+          |  +--rw enabled?       boolean
+          |  +--rw driver?        enumeration
+          |  +--rw device?        string
+          +--rw subinterfaces
+          |  +--rw subinterface* [index]
+          |     +--rw index     -> ../config/index
+          |     +--rw config
+          |     |  +--rw index?         uint32
+          |     |  +--rw name?          string
+          |     |  +--rw description?   string
+          |     |  +--rw enabled?       boolean
+          |     +--rw ipv4
+          |     |  +--rw addresses
+          |     |  |  +--rw address* [ip]
+          |     |  |     +--rw ip        -> ../config/ip
+          |     |  |     +--rw config
+          |     |  |     |  +--rw ip?              inet:ipv4-address-no-zone
+          |     |  |     |  +--rw prefix-length?   uint8
+          |     |  |     +--rw vrrp
+          |     |  |        +--rw vrrp-group* [virtual-router-id]
+          |     |  |           +--rw virtual-router-id     -> ../config/virtual-router-id
+          |     |  |           +--rw config
+          |     |  |           |  +--rw virtual-router-id?        uint8
+          |     |  |           |  +--rw virtual-address*          inet:ipv4-address
+          |     |  |           |  +--rw priority?                 uint8
+          |     |  |           |  +--rw preempt?                  boolean
+          |     |  |           |  +--rw preempt-delay?            uint16
+          |     |  |           |  +--rw accept-mode?              boolean
+          |     |  |           |  +--rw advertisement-interval?   uint16
+          |     |  |           +--rw interface-tracking
+          |     |  |              +--rw config
+          |     |  |                 +--rw track-interface?      string
+          |     |  |                 +--rw priority-decrement?   uint8
+          |     |  +--rw config
+          |     |     +--rw enabled?   boolean
+          |     |     +--rw mtu?       uint16
+          |     +--rw vlan
+          |        +--rw config
+          |           +--rw vlan-id?   oc-vlan-types:vlan-id
+          +--rw ethernet
+             +--rw config
+             |  +--rw mac-address?   yang:mac-address
+             +--rw switched-vlan
+                +--rw config
+                   +--rw interface-mode?   oc-vlan-types:vlan-mode-type
+                   +--rw native-vlan?      oc-vlan-types:vlan-id
+                   +--rw access-vlan?      oc-vlan-types:vlan-id
+                   +--rw trunk-vlans* [vlan-id]
+                      +--rw vlan-id    oc-vlan-types:vlan-id

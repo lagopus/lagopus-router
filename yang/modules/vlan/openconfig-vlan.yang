@@ -1,0 +1,199 @@
+module openconfig-vlan {
+
+  yang-version "1";
+
+  // namespace
+  namespace "http://lagopus.org/yang/vlan";
+
+  prefix "oc-vlan";
+
+  // import some basic types
+  import openconfig-vlan-types { prefix oc-vlan-types; }
+
+  // meta
+  organization "OpenConfig working group";
+
+  contact
+    "OpenConfig working group
+    netopenconfig@googlegroups.com";
+
+  description
+    "This module defines configuration and state variables for VLANs,
+    in addition to VLAN parameters associated with interfaces";
+
+  revision "2017-07-21" {
+    description
+      "Initial revision for lagopus router.";
+    reference "1.0.2-lagopus-0.1.0";
+  }
+
+  revision "2016-05-26" {
+    description
+      "OpenConfig public release";
+    reference "1.0.2";
+  }
+
+  // grouping statements
+
+  grouping vlan-config {
+    description "VLAN configuration container.";
+
+    leaf vlan-id {
+      type oc-vlan-types:vlan-id;
+      description "Interface VLAN id.";
+    }
+
+    leaf name {
+      type string;
+      description "Interface VLAN name.";
+    }
+
+    leaf status {
+      type enumeration {
+        enum ACTIVE {
+          description "VLAN is active";
+        }
+        enum SUSPENDED {
+          description "VLAN is inactive / suspended";
+        }
+      }
+      default ACTIVE;
+      description "Admin state of the VLAN";
+    }
+
+  }
+
+  grouping vlan-ethernet-config {
+    description
+      "VLAN related configuration that is part of the physical
+      Ethernet interface.";
+
+    leaf interface-mode {
+      type oc-vlan-types:vlan-mode-type;
+      description
+        "Set the interface to access or trunk mode for
+        VLANs";
+    }
+
+    leaf native-vlan {
+      type oc-vlan-types:vlan-id;
+      description
+        "Set the native VLAN id for untagged frames arriving on
+        a trunk interface.  This configuration is only valid on
+        a trunk interface.";
+    }
+
+  leaf access-vlan {
+        type oc-vlan-types:vlan-id;
+      description
+        "Assign the access vlan to the access port.";
+    }
+
+   list trunk-vlans {
+     key "vlan-id";
+     leaf vlan-id {
+        type oc-vlan-types:vlan-id;
+	description
+	  "vlan-vid";
+      }
+      description
+        "Specify VLANs, or ranges thereof, that the interface may
+        carry when in trunk mode.  If not specified, all VLANs are
+        allowed on the interface. Ranges are specified in the form
+        x..y, where x<y - ranges are assumed to be inclusive (such
+        that the VLAN range is x <= range <= y.";
+    }
+  }
+
+  grouping vlan-ethernet-top {
+    description
+      "Top-level grouping for VLAN data associated with an
+      Ethernet interface";
+
+    container switched-vlan {
+      description
+        "Enclosing container for VLAN interface-specific
+        data on Ethernet interfaces.  These are for standard
+        L2, switched-style VLANs.";
+
+      container config {
+          description "Configuration parameters for VLANs";
+
+          uses vlan-ethernet-config;
+      }
+    }
+  }
+
+  grouping vlan-logical-config {
+
+    description
+      "VLAN related configuration that is part of subinterface
+      (logical interface) configuration.  These are generally
+      L3 VLANs with an id that is local.";
+
+    leaf vlan-id {
+      type oc-vlan-types:vlan-id;
+      description
+        "VLAN id for the subinterface -- specified inline for the
+        case of a local VLAN.  The id is scoped to the
+        subinterface, and could be repeated on different
+        subinterfaces.";
+    }
+  }
+
+  grouping vlan-top {
+    description "Top-level grouping for VLAN configuration";
+
+    container vlans {
+      description "Container for VLAN configuration and state
+      variables";
+
+      list vlan {
+        key "vlan-id";
+
+        description "Configured VLANs keyed by id";
+
+        leaf vlan-id {
+          type leafref {
+            path "../config/vlan-id";
+          }
+          description "references the configured vlan-id";
+        }
+
+        container config {
+          description "Configuration parameters for VLANs";
+
+          uses vlan-config;
+        }
+      }
+    }
+  }
+
+  grouping vlan-logical-top {
+    description
+      "Top-level grouping for VLAN data associated with a
+      logical interface or subinterface";
+
+    container vlan {
+      description
+        "Enclosing container for VLAN interface-specific
+        data on subinterfaces";
+
+      container config {
+        description "Configuration parameters for VLANs";
+
+        uses vlan-logical-config;
+      }
+    }
+  }
+
+
+  // data definition statements
+
+  // augment statements
+
+  // rpc statements
+
+  // notification statements
+
+}

@@ -1,0 +1,301 @@
+module openconfig-if-ip {
+
+  yang-version "1";
+
+  // namespace
+  namespace "http://lagopus.org/yang/interfaces/ip";
+
+  prefix "oc-ip";
+
+  // import some basic types
+  import ietf-inet-types { prefix inet; }
+
+  // meta
+  organization "OpenConfig working group";
+
+  contact
+    "OpenConfig working group
+    netopenconfig@googlegroups.com";
+
+  description
+    "Model for managing IP interfaces.
+
+    This model reuses most of the IETF YANG model for IP management
+    described by RFC 7277.  The primary differences are in the
+    structure of configuration and state data.";
+
+  revision "2017-07-21" {
+    description
+      "Initial revision for lagopus router.";
+    reference "1.1.0-lagopus-0.1.0";
+  }
+
+  revision "2016-12-22" {
+    description
+      "Fixes to Ethernet interfaces model";
+    reference "1.1.0";
+  }
+
+
+  // typedef statements
+
+  // grouping statements
+
+  grouping ipv4-global-config {
+    description "Configuration data for IPv4 interfaces across
+    all addresses assigned to the interface";
+    reference "RFC 7277 - A YANG Data Model for IP Management";
+
+    leaf enabled {
+      type boolean;
+      default true;
+      description
+        "Controls whether IPv4 is enabled or disabled on this
+         interface.  When IPv4 is enabled, this interface is
+         connected to an IPv4 stack, and the interface can send
+         and receive IPv4 packets.";
+    }
+
+    leaf mtu {
+     type uint16 {
+       range "68..max";
+     }
+     units octets;
+     description
+       "The size, in octets, of the largest IPv4 packet that the
+        interface will send and receive.
+
+        The server may restrict the allowed values for this leaf,
+        depending on the interface's type.
+
+        If this leaf is not configured, the operationally used MTU
+        depends on the interface's type.";
+     reference
+       "RFC 791: Internet Protocol";
+    }
+
+  }
+
+  grouping ipv4-address-config {
+
+    description
+      "Per IPv4 adresss configuration data for the
+      interface.";
+
+    leaf ip {
+       type inet:ipv4-address-no-zone;
+       description
+        "[adapted from IETF IP model RFC 7277]
+
+        The IPv4 address on the interface.";
+    }
+
+    leaf prefix-length {
+      type uint8 {
+       range "0..32";
+      }
+      description
+       "[adapted from IETF IP model RFC 7277]
+
+       The length of the subnet prefix.";
+    }
+  }
+
+  grouping ip-vrrp-tracking-config {
+    description
+      "Configuration data for tracking interfaces
+      in a VRRP group";
+
+    leaf track-interface {
+      type string;
+      // TODO: we may need to add some restriction to ethernet
+      // or IP interfaces.
+      description "Sets an interface that should be
+      tracked for up/down events to dynamically change the
+      priority state of the VRRP group, and potentially
+      change the mastership if the tracked interface going
+      down lowers the priority sufficiently";
+    }
+
+    leaf priority-decrement {
+      type uint8 {
+        range 0..254;
+      }
+      default 0;
+      description "Set the value to subtract from priority when
+      the tracked interface goes down";
+    }
+  }
+
+  grouping ip-vrrp-tracking-top {
+    description
+      "Top-level grouping for VRRP interface tracking";
+
+    container interface-tracking {
+      description
+        "Top-level container for VRRP interface tracking";
+
+      container config {
+        description
+          "Configuration data for VRRP interface tracking";
+
+        uses ip-vrrp-tracking-config;
+      }
+    }
+  }
+
+  grouping ip-vrrp-config {
+    description
+      "Configuration data for VRRP on IP interfaces";
+
+    leaf virtual-router-id {
+      type uint8 {
+        range 1..255;
+      }
+      description
+        "Set the virtual router id for use by the VRRP group.  This
+        usually also determines the virtual MAC address that is
+        generated for the VRRP group";
+    }
+
+    leaf-list virtual-address {
+      type inet:ipv4-address;
+      description "Configure one or more virtual addresses for the
+      VRRP group";
+    }
+
+    leaf priority {
+      type uint8 {
+        range 1..254;
+      }
+      default 100;
+      description "Specifies the sending VRRP interface's priority
+      for the virtual router.  Higher values equal higher
+      priority";
+    }
+
+    leaf preempt {
+      type boolean;
+      default true;
+      description "When set to true, enables preemption by a higher
+      priority backup router of a lower priority master router";
+    }
+
+    leaf preempt-delay {
+      type uint16 {
+        range 0..3600;
+      }
+      default 0;
+      description "Set the delay the higher priority router waits
+      before preempting";
+    }
+
+    leaf accept-mode {
+      type boolean;
+      // TODO: should we adopt the RFC default given the common
+      // operational practice of setting to true?
+      default false;
+      description "Configure whether packets destined for
+      virtual addresses are accepted even when the virtual
+      address is not owned by the router interface";
+    }
+
+    leaf advertisement-interval {
+      type uint16 {
+        range 1..4095;
+      }
+      // TODO this range is theoretical -- needs to be validated
+      // against major implementations.
+      units "centiseconds";
+      default 100;
+      description "Sets the interval between successive VRRP
+      advertisements -- RFC 5798 defines this as a 12-bit
+      value expressed as 0.1 seconds, with default 100, i.e.,
+      1 second.  Several implementation express this in units of
+      seconds";
+    }
+  }
+
+  grouping ip-vrrp-top {
+    description
+      "Top-level grouping for Virtual Router Redundancy Protocol";
+
+    container vrrp {
+      description
+        "Enclosing container for VRRP groups handled by this
+        IP interface";
+
+      reference "RFC 5798 - Virtual Router Redundancy Protocol
+        (VRRP) Version 3 for IPv4 and IPv6";
+
+      list vrrp-group {
+        key "virtual-router-id";
+        description
+          "List of VRRP groups, keyed by virtual router id";
+
+        leaf virtual-router-id {
+          type leafref {
+            path "../config/virtual-router-id";
+          }
+          description
+            "References the configured virtual router id for this
+            VRRP group";
+        }
+
+        container config {
+          description
+            "Configuration data for the VRRP group";
+
+          uses ip-vrrp-config;
+        }
+        uses ip-vrrp-tracking-top;
+      }
+    }
+  }
+
+  grouping ipv4-top {
+    description "Top-level configuration and state for IPv4
+    interfaces";
+
+    container ipv4 {
+      description
+        "Parameters for the IPv4 address family.";
+
+      container addresses {
+        description
+          "Enclosing container for address list";
+
+        list address {
+          key "ip";
+          description
+           "The list of configured IPv4 addresses on the interface.";
+
+          leaf ip {
+            type leafref {
+              path "../config/ip";
+            }
+            description "References the configured IP address";
+          }
+
+          container config {
+            description "Configuration data for each configured IPv4
+            address on the interface";
+
+            uses ipv4-address-config;
+
+          }
+        }
+      }
+      container config {
+        description
+          "Top-level IPv4 configuration data for the interface";
+
+        uses ipv4-global-config;
+      }
+    }
+  }
+
+
+  // augment statements
+
+}

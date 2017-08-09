@@ -1,0 +1,83 @@
+module openconfig-if-ethernet {
+
+  yang-version "1";
+
+  // namespace
+  namespace "http://lagopus.org/yang/interfaces/ethernet";
+
+  prefix "oc-eth";
+
+  // import some basic types
+  import ietf-yang-types { prefix yang; }
+
+  // meta
+  organization "OpenConfig working group";
+
+  contact
+    "OpenConfig working group
+    netopenconfig@googlegroups.com";
+
+  description
+    "Model for managing Ethernet interfaces -- augments the IETF YANG
+    model for interfaces described by RFC 7223";
+
+  revision "2017-07-21" {
+    description
+      "Initial revision for lagopus router.";
+    reference "1.1.0-lagopus-0.1.0";
+  }
+
+  revision "2016-12-22" {
+    description
+      "Fixes to Ethernet interfaces model";
+    reference "1.1.0";
+  }
+
+  // extension statements
+
+  // feature statements
+
+  // identity statements
+
+  // typedef statements
+
+  // grouping statements
+
+  grouping ethernet-interface-config {
+    description "Configuration items for Ethernet interfaces";
+
+    leaf mac-address {
+      type yang:mac-address;
+      description
+        "Assigns a MAC address to the Ethernet interface.  If not
+        specified, the corresponding operational state leaf is
+        expected to show the system-assigned MAC address.";
+    }
+  }
+
+  // data definition statements
+
+  grouping ethernet-top {
+    description "top-level Ethernet config and state containers";
+
+    container ethernet {
+      description
+        "Top-level container for ethernet configuration
+        and state";
+
+      container config {
+        description "Configuration data for ethernet interfaces";
+
+        uses ethernet-interface-config;
+
+      }
+    }
+  }
+
+  // augment statements
+
+  // rpc statements
+
+  // notification statements
+
+}

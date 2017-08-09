@@ -1,0 +1,127 @@
+module openconfig-network-instance-types {
+
+  yang-version "1";
+
+  // namespace
+  namespace "http://lagopus.org/yang/network-instance-types";
+
+  prefix "oc-ni-types";
+
+  // meta
+  organization "OpenConfig working group";
+
+  contact
+    "OpenConfig working group
+    www.openconfig.net";
+
+  description
+    "Types associated with a network instance";
+
+
+  revision "2017-07-21" {
+    description
+      "Initial revision for lagopus router.";
+    reference "0.8.0-lagopus-0.1.0";
+  }
+
+  revision "2017-02-28" {
+    description
+      "Add OSPFv2 to network instance";
+    reference "0.8.0";
+  }
+
+  revision "2017-01-26" {
+    description
+      "Add policy forwarding to network instance";
+    reference "0.7.0";
+  }
+
+  revision "2017-01-13" {
+    description
+      "Add AFT to the network instance";
+    reference "0.6.0";
+  }
+
+  revision "2016-12-15" {
+    description
+      "Add segment routing to network instance";
+    reference "0.5.0";
+  }
+
+  revision "2016-11-10" {
+    description
+      "Update model to include IS-IS.";
+    reference "0.4.1";
+  }
+
+  revision "2016-10-12" {
+    description
+      "Update table connections";
+    reference "0.4.0";
+  }
+
+  revision "2016-09-28" {
+    description
+      "Change L2 instance to submodule; add MAC table";
+    reference "0.3.0";
+  }
+
+  revision "2016-08-11" {
+    description
+      "Resolve repeated container names in routing protocols";
+    reference "0.2.3";
+  }
+
+  revision "2016-07-08" {
+    description
+      "Updated with refactored routing protocol models";
+    reference "0.2.1";
+  }
+
+  revision "2016-03-29" {
+    description
+      "Initial revision";
+    reference "0.2.0";
+  }
+
+  revision "2015-10-18" {
+    description
+      "Initial revision";
+    reference "0.1.0";
+  }
+
+  // identity statements
+
+  typedef NETWORK_INSTANCE_TYPE {
+    type enumeration {
+      enum "L3VRF" {
+        description
+          "A private Layer 3 only routing instance which is formed of
+          one or more RIBs";
+      }
+      enum "L2VSI" {
+        description
+          "A private Layer 2 only switch instance which is formed of
+         one or more L2 forwarding tables";
+      }
+    }
+     description
+       "A base identity which can be extended to indicate different
+       types of network instance supported by a device.";
+  }
+
+  // rjs note:
+  // this should move to openconfig-types when merged
+  typedef route-distinguisher {
+    // type 2: <4-byte as-number>:<2-byte assigned number>
+    type string {
+      pattern
+        '^(4[0-2][0-9][0-4][0-9][0-6][0-7][0-2][0-9][0-5]|'
+        + '[0-3][0-9]{9}|[1-9][0-9]{1,8}|[1-9]):'
+        + '(65[0-5][0-3][0-5]|[1-5]{2}[0-9]{3}|'
+        + '[1-9]{0,2}[0-9][0-9]|[1-9])$';
+    }
+    description "A route distinguisher value";
+    reference "RFC4364";
+  }
+}

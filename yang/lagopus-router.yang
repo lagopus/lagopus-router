@@ -1,0 +1,124 @@
+module lagopus-router {
+  yang-version "1";
+
+  // namespace
+  namespace "http://lagopus.org/yang/lagopus";
+
+  prefix lago;
+
+  // import basic schema
+  import openconfig-network-instance { prefix "oc-netinst"; }
+  import openconfig-vlan { prefix "oc-vlan"; }
+  import openconfig-interfaces { prefix "oc-if"; }
+  import openconfig-if-ip { prefix "oc-ip"; }
+  import openconfig-if-ethernet { prefix "oc-eth"; }
+
+  organization "Lagopus project";
+
+  contact
+    "Lagopus project
+    lagopus-devel@lists.sourceforge.net";
+  description
+    "A description of a Lagopus Software Router.";
+
+  revision "2017-07-21" {
+    description
+      "Initial revision";
+    reference "0.1.0";
+  }
+
+  // extension statements
+
+  // feature statements
+
+  // identity statements
+
+  // typedef statements
+
+  // grouping statements
+
+  // data definition statements
+
+  uses oc-netinst:network-instance-top;
+  uses oc-if:interfaces-top;
+
+  // augment statements
+
+  // Augment for ethernet
+
+  augment "/lago:interfaces/lago:interface/lago:config" {
+    description "Assigns Interface device";
+
+    leaf driver {
+      type enumeration {
+        enum "dpdk" {
+	  description "DPDK interface";
+	}
+        enum "rawsock" {
+	  description "Rawsocket interface";
+        }
+        enum "local" {
+          description "Local interface (e.g. Routing interface)";
+        }
+      }
+      description "Assigns driver";
+    }
+    leaf device {
+      type string;
+      description "Assigns device";
+    }
+  }
+
+  // augment statements
+
+  augment "/lago:interfaces/lago:interface" {
+    description "Adds addtional Ethernet-specific configuration to
+    interfaces model";
+
+    uses oc-eth:ethernet-top;
+  }
+
+  augment "/lago:interfaces/lago:interface/lago:ethernet" {
+    description "Adds VLAN settings to individual Ethernet
+    interfaces";
+
+    uses oc-vlan:vlan-ethernet-top;
+  }
+
+
+  augment "/lago:interfaces/lago:interface/lago:subinterfaces/" +
+    "lago:subinterface" {
+    description
+      "IPv4 addr family configuration for
+      interfaces";
+
+    uses oc-ip:ipv4-top;
+
+  }
+
+  augment "/lago:interfaces/lago:interface/lago:subinterfaces/" +
+    "lago:subinterface" {
+    //TODO: augmentation path will need to be updated for
+    //full device model
+    description "Adds VLAN settings to individual subinterfaces";
+
+    uses oc-vlan:vlan-logical-top;
+  }
+
+  // VRRP for IPv4 interfaces
+
+  augment "/lago:interfaces/lago:interface/lago:subinterfaces/" +
+    "lago:subinterface/lago:ipv4/lago:addresses/lago:address" {
+
+    description
+      "Additional IP addr family configuration for
+      interfaces";
+
+    uses oc-ip:ip-vrrp-top;
+
+  }
+
+  // rpc statements
+
+  // notification statements
+}
