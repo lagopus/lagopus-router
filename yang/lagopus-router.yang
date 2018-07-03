@@ -13,6 +13,8 @@ module lagopus-router {
   import openconfig-if-ip { prefix "oc-ip"; }
   import openconfig-if-ethernet { prefix "oc-eth"; }
 
+  import lagopus-ip-tunnel {prefix "lago-tunnel"; }
+
   organization "Lagopus project";
 
   contact
@@ -20,6 +22,12 @@ module lagopus-router {
     lagopus-devel@lists.sourceforge.net";
   description
     "A description of a Lagopus Software Router.";
+
+  revision "2017-12-11" {
+    description
+      "Refactoring for beta version";
+    reference "0.2.0";
+  }
 
   revision "2017-07-21" {
     description
@@ -116,6 +124,16 @@ module lagopus-router {
 
     uses oc-ip:ip-vrrp-top;
 
+  }
+
+  // IPtunnel
+
+  augment "/lago:interfaces/lago:interface/lago:subinterfaces/" +
+    "lago:subinterface" {
+
+   description "";
+
+   uses lago-tunnel:tunnel-top;
   }
 
   // rpc statements

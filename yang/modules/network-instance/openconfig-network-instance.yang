@@ -9,9 +9,7 @@ module openconfig-network-instance {
 
   import ietf-yang-types { prefix "yang"; }
   import openconfig-network-instance-types { prefix "oc-ni-types"; }
-  import openconfig-interfaces { prefix "oc-if"; }
   import openconfig-network-instance-l3 { prefix "oc-ni-l3"; }
-  import openconfig-types { prefix "oc-types"; }
   import openconfig-vlan { prefix "oc-vlan"; }
 
   // include submodules
@@ -30,6 +28,12 @@ module openconfig-network-instance {
     forwarding (VRF) instance, or a Layer 2 instance such as a
     virtual switch instance (VSI). Mixed Layer 2 and Layer 3
     instances are also supported.";
+
+  revision "2017-12-11" {
+    description
+      "Refactoring for beta version";
+    reference "0.8.0-lagopus-0.2.0";
+  }
 
   revision "2017-07-26" {
     description
@@ -119,11 +123,10 @@ module openconfig-network-instance {
           "Network instances configured on the local system";
 
         leaf name {
-          type leafref {
-            path "../config/name";
-          }
+	  type string;
           description
-            "A unique name identifying the network instance";
+            "An operator-assigned unique name for the forwarding
+            instance";
         }
 
         uses l2ni-instance {
@@ -147,27 +150,26 @@ module openconfig-network-instance {
             instance";
 
           list interface {
-            key "id";
-            unique "config/interface config/subinterface";
+            key "name";
 
             description
               "An interface associated with the network instance";
 
-            leaf id {
-              type leafref {
-                path "../config/id";
-              }
-              description
-                "A reference to an identifier for this interface which
-                acts as a key for this list";
-            }
+	    leaf name {
+	      type string;
+	      description "";
+	    }
 
-            container config {
-              description
-                "Configuration parameters relating to the associated
-                interface";
-              uses instance-interfaces-config;
-            }
+	    list subinterface {
+	      key "index";
+
+	      description
+		"";
+	      leaf index {
+		type uint32;
+		description "";
+	      }
+	    }
           }
         }
         uses oc-vlan:vlan-top;
@@ -193,44 +195,10 @@ module openconfig-network-instance {
     }
   }
 
-  grouping instance-interfaces-config {
-    description
-      "Configuration parameters related to an interface associated
-      with the network instance";
-
-    leaf id {
-      type string;
-      description
-        "A unique identifier for this interface - this is expressed
-        as a free-text string";
-    }
-
-    uses oc-if:interface-ref-common;
-
-    leaf-list associated-address-families {
-      type oc-types:ADDRESS_FAMILY;
-      description
-        "The address families on the subinterface which are to be
-        associated with this network instance. When this leaf-list
-        is empty and the network instance requires Layer 3 information
-        the address families for which the network instance is
-        enabled should be imported. If the value of this leaf-list
-        is specified then the association MUST only be made for
-        those address families that are included in the list.";
-    }
-  }
-
   grouping network-instance-config {
     description
       "Configuration parameters relating to a top-level network
       instance";
-
-    leaf name {
-      type string;
-      description
-        "An operator-assigned unique name for the forwarding
-        instance";
-    }
 
     leaf type {
       type oc-ni-types:NETWORK_INSTANCE_TYPE;
@@ -242,6 +210,7 @@ module openconfig-network-instance {
 
     leaf enabled {
       type boolean;
+      mandatory true;
       description
         "Whether the network instance should be configured to be
         active on the network element";

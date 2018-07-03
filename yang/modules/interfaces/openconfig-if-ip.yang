@@ -82,14 +82,6 @@ module openconfig-if-ip {
       "Per IPv4 adresss configuration data for the
       interface.";
 
-    leaf ip {
-       type inet:ipv4-address-no-zone;
-       description
-        "[adapted from IETF IP model RFC 7277]
-
-        The IPv4 address on the interface.";
-    }
-
     leaf prefix-length {
       type uint8 {
        range "0..32";
@@ -147,16 +139,6 @@ module openconfig-if-ip {
   grouping ip-vrrp-config {
     description
       "Configuration data for VRRP on IP interfaces";
-
-    leaf virtual-router-id {
-      type uint8 {
-        range 1..255;
-      }
-      description
-        "Set the virtual router id for use by the VRRP group.  This
-        usually also determines the virtual MAC address that is
-        generated for the VRRP group";
-    }
 
     leaf-list virtual-address {
       type inet:ipv4-address;
@@ -234,12 +216,13 @@ module openconfig-if-ip {
           "List of VRRP groups, keyed by virtual router id";
 
         leaf virtual-router-id {
-          type leafref {
-            path "../config/virtual-router-id";
+          type uint8 {
+            range 1..255;
           }
           description
-            "References the configured virtual router id for this
-            VRRP group";
+            "Set the virtual router id for use by the VRRP group.  This
+            usually also determines the virtual MAC address that is
+            generated for the VRRP group";
         }
 
         container config {
@@ -270,11 +253,12 @@ module openconfig-if-ip {
           description
            "The list of configured IPv4 addresses on the interface.";
 
-          leaf ip {
-            type leafref {
-              path "../config/ip";
-            }
-            description "References the configured IP address";
+        leaf ip {
+          type inet:ipv4-address-no-zone;
+          description
+            "[adapted from IETF IP model RFC 7277]
+
+            The IPv4 address on the interface.";
           }
 
           container config {

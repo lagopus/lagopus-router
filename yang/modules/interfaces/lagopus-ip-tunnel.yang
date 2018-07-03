@@ -1,0 +1,164 @@
+module lagopus-ip-tunnel {
+
+  yang-version "1";
+
+  // namespace
+  namespace "http://lagopus.org/yang/interfaces/tunnel";
+
+  prefix "lago-tunnel";
+
+  //import some basic types
+  import ietf-inet-types { prefix inet; }
+  import openconfig-types { prefix "octypes"; }
+
+  //meta
+  organization "Lagopus project";
+
+  contact
+    "Lagopus project
+    lagopus-devel@lists.sourceforge.net";
+
+  description
+    "Model for managing tunnel interfaces";
+
+  revision "2017-12-11" {
+    description
+      "Refactoring for beta version";
+    reference "0.1.0";
+  }
+
+  revision "2017-07-27" {
+    description
+      "Initial revision";
+    reference "0.0.0";
+  }
+
+  // extension statements
+
+  // feature statements
+
+  // identity statements
+
+  // typedef statements
+
+  typedef ENCAPSMETHOD {
+    type enumeration {
+      enum "direct" {
+	value 2;
+        description "no intermediate header";
+      }
+      enum "gre" {
+	value 3;
+        description "GRE encapsulation";
+      }
+    }
+    description
+            "The encapsulation method used by a tunnel. The value
+            direct indicates that a packet is encapsulated
+            directly within a normal IP header, with no
+            intermediate header, and unicast to the remote tunnel
+            endpoint (e.g., an RFC 2003 IP-in-IP tunnel, or an RFC
+            1933 IPv6-in-IPv4 tunnel).
+
+            The remaining protocol-specific values indicate that a
+            header of the protocol of that name is inserted
+            between the outer header and the payload header.";
+    reference
+      "IANA ifType MIB - Internet Assigned Numbers Authority
+      https://www.iana.org/assignments/ianaiftype-mib/ianaiftype-mib";
+  }
+
+  typedef TUNNELSECURITY {
+    type enumeration {
+      enum "none" {
+        value 1;
+        description "no security";
+      }
+      enum "ipsec" {
+        value 2;
+        description "IPsec security";
+      }
+    }
+    description "The value ipsec indicates that IPsec is used
+               between the tunnel endpoints for authentication or
+               encryption or both.";
+  }
+
+  // grouping statements
+
+  grouping tunnel-if-config {
+    description "";
+    leaf address-type {
+      type octypes:ADDRESS_FAMILY;
+      description
+               "The type of address in the corresponding
+               tunnelIfLocalInetAddress and tunnelIfRemoteInetAddress
+               objects.";
+    }
+    leaf local-inet-address {
+      type inet:ipv4-address-no-zone;
+      description
+               "The address of the local endpoint of the tunnel
+               (i.e., the source address used in the outer IP
+               header).";
+    }
+    leaf remote-inet-address {
+      type inet:ipv4-address-no-zone;
+      description
+               "The address of the remote endpoint of the tunnel
+               (i.e., the destination address used in the outer IP
+               header).";
+    }
+    leaf encaps-method {
+      type ENCAPSMETHOD;
+      mandatory true;
+      description
+               "The encapsulation method used by the tunnel.";
+    }
+    leaf hop-limit {
+      type uint8;
+      description
+               "The IPv4 TTL or IPv6 Hop Limit to use in the outer IP
+               header.  A value of 0 indicates that the value is
+               copied from the payload's header.";
+    }
+    leaf security {
+      type TUNNELSECURITY;
+      description
+               "The method used by the tunnel to secure the outer IP
+               header.  The value ipsec indicates that IPsec is used
+               between the tunnel endpoints for authentication or
+               encryption or both.  More specific security-related
+               information may be available in a MIB module for the
+               security protocol in use.";
+    }
+    leaf tos {
+      type int8 {
+        range "-2..63";
+      }
+      description
+               "The method used to set the high 6 bits (the
+               differentiated services codepoint) of the IPv4 TOS or
+               IPv6 Traffic Class in the outer IP header. A value of
+               -1 indicates that the bits are copied from the
+               payload's header. ";
+    }
+    // leaf Flowlabel {};
+    // leaf EncapLimit {};
+  }
+
+  grouping tunnel-top {
+    description "Top-level grouping for the tunnel.";
+
+    container tunnel {
+      description "Container for tunnel configuration variables.";
+      container config {
+        description "Configuration parameters for tunnels.";
+	uses tunnel-if-config;
+      }
+    }
+  }
+
+  // data definition statements
+
+}

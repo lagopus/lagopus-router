@@ -113,13 +113,6 @@ submodule openconfig-network-instance-l2 {
       "Common configuration options which are specific to Layer 2
       network instances";
 
-    leaf mtu {
-      type uint16;
-      description
-        "The maximum frame size which should be supported for this
-        instance for Layer 2 frames";
-    }
-
   }
 
   grouping l2ni-fdb-mac-config {

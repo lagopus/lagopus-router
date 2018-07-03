@@ -33,6 +33,11 @@ module openconfig-interfaces {
     (particularly for operational state data) and and with
     additional configuration items.";
 
+  revision "2017-12-11" {
+    description
+      "Refactoring for beta version";
+    reference "1.1.0-lagopus-0.2.0";
+  }
 
   revision "2017-07-21" {
     description
@@ -52,6 +57,7 @@ module openconfig-interfaces {
 
     leaf interface {
       type string;
+      mandatory true;
       description
         "Reference to a base interface.  If a reference to a
         subinterface is required, this leaf must be specified
@@ -72,47 +78,6 @@ module openconfig-interfaces {
     description
       "Configuration data data nodes common to physical interfaces
       and subinterfaces";
-
-    leaf name {
-      type string;
-      description
-        "[adapted from IETF interfaces model (RFC 7223)]
-
-        The name of the interface.
-
-        A device MAY restrict the allowed values for this leaf,
-        possibly depending on the type of the interface.
-        For system-controlled interfaces, this leaf is the
-        device-specific name of the interface.  The 'config false'
-        list interfaces/interface[name]/state contains the currently
-        existing interfaces on the device.
-
-        If a client tries to create configuration for a
-        system-controlled interface that is not present in the
-        corresponding state list, the server MAY reject
-        the request if the implementation does not support
-        pre-provisioning of interfaces or if the name refers to
-        an interface that can never exist in the system.  A
-        NETCONF server MUST reply with an rpc-error with the
-        error-tag 'invalid-value' in this case.
-
-        The IETF model in RFC 7223 provides YANG features for the
-        following (i.e., pre-provisioning and arbitrary-names),
-        however they are omitted here:
-
-          If the device supports pre-provisioning of interface
-          configuration, the 'pre-provisioning' feature is
-          advertised.
-
-          If the device allows arbitrarily named user-controlled
-          interfaces, the 'arbitrary-names' feature is advertised.
-
-        When a configured user-controlled interface is created by
-        the system, it is instantiated with the same name in the
-        /interfaces/interface[name]/state list.";
-      reference
-        "RFC 7223: A YANG Data Model for Interface Management";
-    }
 
     leaf description {
       type string;
@@ -152,6 +117,7 @@ module openconfig-interfaces {
     leaf enabled {
       type boolean;
       default "true";
+      mandatory true;
       description
         "[adapted from IETF interfaces model (RFC 7223)]
 
@@ -217,16 +183,6 @@ module openconfig-interfaces {
     description
       "Configuration data for subinterfaces";
 
-    leaf index {
-      type uint32;
-      default 0;
-      description
-        "The index of the subinterface, or logical interface number.
-        On systems with no support for subinterfaces, or not using
-        subinterfaces, this value should default to 0, i.e., the
-        default subinterface.";
-    }
-
     uses interface-common-config;
 
   }
@@ -249,12 +205,10 @@ module openconfig-interfaces {
           with a physical interface";
 
         leaf index {
-          type leafref {
-            path "../config/index";
-          }
+	  type uint32;
           description
-            "The index number of the subinterface -- used to address
-            the logical interface";
+            "The index of the subinterface, or logical interface number.
+            On systems with no support for subinterfaces.";
         }
 
         container config {
@@ -285,18 +239,9 @@ module openconfig-interfaces {
           "The list of named interfaces on the device.";
 
         leaf name {
-          type leafref {
-            path "../config/name";
-          }
+	  type string;
           description
             "References the configured name of the interface";
-            //TODO: need to consider whether this should actually
-            //reference the name in the state subtree, which
-            //presumably would be the system-assigned name, or the
-            //configured name.  Points to the config/name now
-            //because of YANG 1.0 limitation that the list
-            //key must have the same "config" as the list, and
-            //also can't point to a non-config node.
         }
 
         container config {

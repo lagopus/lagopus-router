@@ -38,11 +38,6 @@ module openconfig-vlan {
   grouping vlan-config {
     description "VLAN configuration container.";
 
-    leaf vlan-id {
-      type oc-vlan-types:vlan-id;
-      description "Interface VLAN id.";
-    }
-
     leaf name {
       type string;
       description "Interface VLAN name.";
@@ -58,6 +53,7 @@ module openconfig-vlan {
         }
       }
       default ACTIVE;
+      mandatory true;
       description "Admin state of the VLAN";
     }
 
@@ -154,10 +150,8 @@ module openconfig-vlan {
         description "Configured VLANs keyed by id";
 
         leaf vlan-id {
-          type leafref {
-            path "../config/vlan-id";
-          }
-          description "references the configured vlan-id";
+          type oc-vlan-types:vlan-id;
+            description "Interface VLAN id.";
         }
 
         container config {

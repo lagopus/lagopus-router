@@ -42,6 +42,12 @@ module iana-if-type {
     "IANA 'ifType definitions' registry.
      <http://www.iana.org/assignments/smi-numbers>";
 
+  revision "2017-12-11" {
+    description
+      "Refactoring for beta version";
+    reference "lagopus-0.2.0";
+  }
+
   revision 2017-07-25 {
     description
       "Initial revision for lagopus router.";
@@ -109,26 +115,14 @@ module iana-if-type {
           "RFC 3635 - Definitions of Managed Objects for the
                       Ethernet-like Interface Types";
       }
+      enum "tunnel" {
+        value 131;
+        description
+          "Encapsulation interface.";
+      }
     }
     description
       "This identity is used as a base for all interface types
        defined in the 'ifType definitions' registry.";
   }
-
-  // identity iana-interface-type {
-  //   base if:interface-type;
-  //   description
-  //     "This identity is used as a base for all interface types
-  //      defined in the 'ifType definitions' registry.";
-  // }
-
-  // identity ethernetCsmacd {
-  //   base iana-interface-type;
-  //   description
-  //     "For all Ethernet-like interfaces, regardless of speed,
-  //      as per RFC 3635.";
-  //   reference
-  //     "RFC 3635 - Definitions of Managed Objects for the
-  //                 Ethernet-like Interface Types";
-  // }
 }

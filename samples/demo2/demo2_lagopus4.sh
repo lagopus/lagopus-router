@@ -4,15 +4,11 @@ source /etc/bash_completion.d/cli
 
 configure
 
-set interfaces interface if0 config name if0
-set interfaces interface if0 config mtu 1518
+set interfaces interface if0 config mtu 1514
 set interfaces interface if0 config driver dpdk
 set interfaces interface if0 config device 0000:05:00.0
 set interfaces interface if0 config type ethernetCsmacd
-set interfaces interface if0 subinterfaces subinterface 0 config index 0
-set interfaces interface if0 subinterfaces subinterface 0 ipv4 addresses address 172.16.30.2 config ip 172.16.30.2
 set interfaces interface if0 subinterfaces subinterface 0 ipv4 addresses address 172.16.30.2 config prefix-length 24
-set interfaces interface if0 subinterfaces subinterface 0 ipv4 addresses address 172.16.30.2 vrrp vrrp-group 1 config virtual-router-id 1
 set interfaces interface if0 subinterfaces subinterface 0 ipv4 addresses address 172.16.30.2 vrrp vrrp-group 1 config virtual-address 172.16.30.3
 set interfaces interface if0 subinterfaces subinterface 0 ipv4 addresses address 172.16.30.2 vrrp vrrp-group 1 config priority 100
 set interfaces interface if0 subinterfaces subinterface 0 ipv4 addresses address 172.16.30.2 vrrp vrrp-group 1 config preempt true
@@ -24,15 +20,11 @@ set interfaces interface if0 subinterfaces subinterface 0 ipv4 addresses address
 set interfaces interface if0 subinterfaces subinterface 0 config enabled true
 set interfaces interface if0 config enabled true
 
-set interfaces interface if1 config name if1
-set interfaces interface if1 config mtu 1518
+set interfaces interface if1 config mtu 1514
 set interfaces interface if1 config driver dpdk
 set interfaces interface if1 config device 0000:05:00.1
 set interfaces interface if1 config type ethernetCsmacd
-set interfaces interface if1 subinterfaces subinterface 0 config index 0
-set interfaces interface if1 subinterfaces subinterface 0 ipv4 addresses address 172.16.40.2 config ip 172.16.40.2
 set interfaces interface if1 subinterfaces subinterface 0 ipv4 addresses address 172.16.40.2 config prefix-length 24
-set interfaces interface if1 subinterfaces subinterface 0 ipv4 addresses address 172.16.40.2 vrrp vrrp-group 1 config virtual-router-id 1
 set interfaces interface if1 subinterfaces subinterface 0 ipv4 addresses address 172.16.40.2 vrrp vrrp-group 1 config virtual-address 172.16.40.3
 set interfaces interface if1 subinterfaces subinterface 0 ipv4 addresses address 172.16.40.2 vrrp vrrp-group 1 config priority 100
 set interfaces interface if1 subinterfaces subinterface 0 ipv4 addresses address 172.16.40.2 vrrp vrrp-group 1 config preempt true
@@ -45,19 +37,10 @@ set interfaces interface if1 subinterfaces subinterface 0 config enabled true
 set interfaces interface if1 config enabled true
 
 # network-instnace vrf1
-set network-instances network-instance vrf1 config name vrf1
 set network-instances network-instance vrf1 config type L3VRF
 set network-instances network-instance vrf1 config enabled true
 set network-instances network-instance vrf1 config enabled-address-families IPV4
-set network-instances network-instance vrf1 config mtu 1500
-set network-instances network-instance vrf1 interfaces interface if0-0 config id if0-0
-set network-instances network-instance vrf1 interfaces interface if0-0 config interface if0
-set network-instances network-instance vrf1 interfaces interface if0-0 config subinterface 0
-set network-instances network-instance vrf1 interfaces interface if0-0 config associated-address-families IPV4
-set network-instances network-instance vrf1 interfaces interface if1-0 config id if1-0
-set network-instances network-instance vrf1 interfaces interface if1-0 config interface if1
-set network-instances network-instance vrf1 interfaces interface if1-0 config subinterface 0
-set network-instances network-instance vrf1 interfaces interface if1-0 config associated-address-families IPV4
-
+set network-instances network-instance vrf1 interfaces interface if0 subinterface 0
+set network-instances network-instance vrf1 interfaces interface if1 subinterface 0
 
 commit
