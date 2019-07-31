@@ -11,6 +11,7 @@ module openconfig-network-instance {
   import openconfig-network-instance-types { prefix "oc-ni-types"; }
   import openconfig-network-instance-l3 { prefix "oc-ni-l3"; }
   import openconfig-vlan { prefix "oc-vlan"; }
+  import lagopus-policy-based-routing {prefix "lago-pbr"; }
 
   // include submodules
   include openconfig-network-instance-l2;
@@ -107,6 +108,7 @@ module openconfig-network-instance {
     reference "0.1.0";
   }
 
+
   grouping network-instance-top {
     description
       "Top-level grouping containing a list of network instances.";
@@ -130,10 +132,10 @@ module openconfig-network-instance {
         }
 
         uses l2ni-instance {
-           description
-             "Layer 2 configuration parameters included when
-              a network instance is a Layer 2 instance or a
-              combined L2L3 instance";
+	  description
+	    "Layer 2 configuration parameters included when
+            a network instance is a Layer 2 instance or a
+            combined L2L3 instance";
         }
 
         container config {
@@ -172,6 +174,7 @@ module openconfig-network-instance {
 	    }
           }
         }
+	uses lago-pbr:pbr-entries-top;
         uses oc-vlan:vlan-top;
       }
     }

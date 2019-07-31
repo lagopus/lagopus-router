@@ -1,0 +1,460 @@
+module ietf-ipsec {
+  namespace "urn:ietf:params:xml:ns:yang:ietf-ipsec";
+  prefix "ipsec";
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+
+  organization "Ericsson AB.
+                   Huawei Technologies India Pvt Ltd.";
+
+  contact "Web:   <http://www.ericsson.com>";
+
+  description
+    "This YANG module defines the configuration and operational
+        state data for Internet Protocol Security (IPSec) on
+        IETF draft.
+        Copyright (c) 2016 Ericsson AB.
+        All rights reserved.";
+
+  revision 2016-03-09 {
+    description
+      "Third revision.
+          Fix YANG compiling error because it used internal
+          data model econtext and should be removed in the
+          draft.
+          Fix warnings.
+          Run validation on
+          http://www.netconfcentral.org/yangdumpresults";
+    reference
+      "Update since second revision.";
+  }
+  revision 2015-09-13 {
+    description
+      "Second revision.";
+    reference
+      "updates since initial revision.
+         combining:
+          draft-tran-ipecme-yang-ipsec-00.
+          draft-wang-ipsecme-ike-yang-00.
+          draft-wang-ipsecme-ipsec-yang-00.";
+  }
+  revision 2015-05-14 {
+    description
+      "Initial revision.";
+    reference
+      "May 14, 2015  draft-tran-ipecme-yang-ipsec-00.
+          May 22, 2015  draft-wang-ipsecme-ike-yang-00.
+          June 15, 2015 draft-wang-ipsecme-ipsec-yang-00.";
+  }
+
+  /*--------------------*/
+  /* Typedefs           */
+  /*--------------------*/
+
+  typedef transport-protocol-name-t {
+    type enumeration {
+      enum any {
+	value 0;
+	description
+	"Any Transport Protocol";
+      }
+      enum tcp {
+	value 1;
+	description
+	"Transmission Control Protocol (TCP) Transport Protocol.";
+      }
+      enum udp {
+	value 2;
+	description
+	"User Datagram Protocol (UDP) Transport Protocol";
+      }
+      enum sctp {
+	value 3;
+	description
+	"Stream Control Transmission Protocol (SCTP) Transport "+
+	"Protocol";
+      }
+      enum icmp {
+	value 4;
+	description
+	"Internet Control Message Protocol (ICMP) Transport "+
+	"Protocol";
+      }
+    }
+    description
+      "Enumeration of well known transport protocols.";
+  }
+
+  typedef preshared-key-t {
+    type string;
+    description
+      "Derived string used as Pre-Shared Key.";
+  }
+
+
+
+  /*-------------------------------------------------- */
+  /* draft-wang-ipsecme-ipsec-yang-00: ietf-ipsec-type */
+  /*-------------------------------------------------- */
+  typedef ipsec-mode {
+    type enumeration {
+      enum "tunnel" {
+	description
+	  "Tunnel mode";
+      }
+    }
+    description
+      "type define of ipsec mode";
+  }
+
+  typedef ipsec-protocol {
+    type enumeration {
+      enum "esp" {
+	description
+	  "ESP Protocol";
+      }
+    }
+    description
+      "type define of ipsec security protocol";
+  }
+
+  typedef ipsec-traffic-direction {
+    type enumeration {
+      enum inbound {
+	description
+	"Inbound traffic";
+      }
+      enum outbound {
+	description
+	"Outbound traffic";
+      }
+    }
+    description
+      "IPsec traffic direction";
+  }
+
+  typedef spd-policy {
+    type enumeration {
+      enum protect {
+	description "";
+      }
+      enum discard {
+	description "";
+      }
+    }
+    description
+      "";
+  }
+
+  typedef encap-protocol {
+    type enumeration {
+      enum none {
+	description "";
+      }
+      enum udp {
+	description "";
+      }
+    }
+    description "";
+  }
+
+  /*--------------------*/
+  /*   grouping         */
+  /*--------------------*/
+
+  /* The following groupings are used in both configuration data
+     and operational state data */
+
+  grouping ipsec-sa-esp-grouping {
+    description
+      "Configure IPSec Encapsulation Security Payload (ESP)";
+    container esp {
+      description
+	"Set IPSec Encapsulation Security Payloer (ESP)";
+      container authentication {
+	description
+	  "Configure authentication for IPSec
+              Encapsulation Secutiry Payload (ESP)";
+	choice authentication-algorithm {
+	  mandatory true;
+	  description
+	    "choice for authentication algorithm to set";
+	  case hmac-sha1-96 {
+	    container hmac-sha1-96 {
+	      description
+		"Set the authentication algorithm to hmac-sha1-96";
+	      leaf key-str {
+		type string {
+		  pattern "[0-9a-fA-F]{24,40}";
+		}
+		description "";
+	      }
+	    }
+	  }
+	  case null {
+	    leaf null {
+	      type empty;
+	      description "";
+	    }
+	  }
+	}
+      }
+      container encryption {
+	description
+	  "Configure encryption for IPSec
+              Encapsulation Secutiry Payload (ESP)";
+	choice encryption-algorithm {
+	  mandatory true;
+	  description
+	    "type of encryption";
+	  case aes-128-cbc {
+	    container aes-128-cbc {
+	      description
+		"Set the encryption algorithm to aes-128-cbc";
+	      leaf key-str {
+		type string {
+		  pattern "[0-9a-fA-F]{32}";
+		}
+		description "";
+	      }
+	    }
+	  }
+	  case aes-128-gcm {
+	    container aes-128-gcm {
+	      description
+		"Set the encryption algorithm to aes-128-gcm";
+	      leaf key-str {
+		type string {
+		  pattern "[0-9a-fA-F]{40}";
+		}
+		description "";
+	      }
+	    }
+	  }
+	  case null {
+	    leaf null {
+	      type empty;
+	      description "";
+	    }
+	  }
+	}
+      }
+    }
+  }
+
+  grouping ip-address-grouping {
+    description
+      "IP Address grouping";
+
+    choice ip-address {
+      description
+	"Choice of IPv4 or IPv6.";
+      leaf ipv4-address {
+	type inet:ipv4-address;
+	mandatory true;
+	description
+	  "Specifies the identity as a single four (4)
+              octet IPv4 address.
+              An example is, 10.10.10.10. ";
+      }
+    }
+  }
+  grouping ip-address-no-zone-grouping {
+    description
+      "IP Address grouping";
+
+    choice ip-address {
+      description
+	"Choice of IPv4 or IPv6.";
+      leaf ipv4-address {
+	type inet:ipv4-address-no-zone;
+	mandatory true;
+	description
+	  "Specifies the identity as a single four (4)
+              octet IPv4 address.
+              An example is, 10.10.10.10. ";
+      }
+    }
+  }
+  grouping ipsec-sa-config {
+    description
+      "Configure Security Association (SA)";
+    leaf sa-mode {
+      type ipsec-mode;
+      mandatory true;
+      description
+	"SA Mode: tunnel or transport mode";
+    }
+    container life-time {
+      leaf life-time-in-seconds {
+	type uint32;
+	description
+	  "SA life time in seconds";
+      }
+      leaf life-time-in-byte {
+	type uint32;
+	description
+	  "SA life time in bytes";
+      }
+      description
+	"SA life time information";
+    }
+    container local-peer {
+      description
+	"Specify the local peer IP address";
+      uses ip-address-no-zone-grouping;
+    }
+    container remote-peer {
+      description
+	"Specify the remote peer IP address";
+      uses ip-address-no-zone-grouping;
+    }
+    leaf encap-protocol {
+      type encap-protocol;
+      description "";
+    }
+    leaf encap-src-port {
+      type uint16;
+      description "";
+    }
+    leaf encap-dst-port {
+      type uint16;
+      description "";
+    }
+    uses ipsec-sa-esp-grouping;
+  }
+
+
+  /*--------------------*/
+  /* Configuration Data */
+  /*--------------------*/
+
+  grouping ipsec-top {
+    container ipsec {
+      description
+	"Configuration IPsec";
+      container sad {
+	description
+	  "Configure the IPSec Security Association Database (SAD)";
+	list sad-entries {
+	  key "spi";
+	  description
+	    "Configure IPsec Security Association Database(SAD)";
+	  leaf spi {
+	    type uint32;
+	    mandatory true;
+	    description
+	      "Specify Security Parameter Index";
+	  }
+	  container config {
+	    description "";
+	    uses ipsec-sa-config;
+	  }
+	}
+      }
+      container spd {
+	description
+	  "Configure the Security Policy Database (SPD)";
+	list spd-entries {
+	  key "name";
+	  leaf name {
+	    type string;
+	    mandatory true;
+	    description
+	      "IPSec Policy Identification";
+	  }
+	  container config {
+	    description "";
+	    leaf description {
+	      type string;
+	      description
+		"Specify the description.";
+	    }
+	    leaf spi {
+	      type uint32;
+	      mandatory true;
+	      description
+		"Specify Security Parameter Index";
+	    }
+	    container source-address {
+	      description
+		"Specify the source IP address and
+                    port of protected traffic";
+	      uses ip-address-no-zone-grouping;
+	      leaf prefix-length {
+		type uint8 {
+		  range "0..32";
+		}
+		description
+		  "[adapted from IETF IP model RFC 7277]
+                      The length of the subnet prefix.";
+	      }
+	      leaf port-number {
+		type uint16;
+		description
+		  "port of protected traffic";
+	      }
+	    }
+	    container destination-address {
+	      description
+		"Specify the destination IP address and
+                    port of protected traffic";
+	      uses ip-address-no-zone-grouping;
+	      leaf prefix-length {
+		type uint8 {
+		  range "0..32";
+		}
+		description
+		  "[adapted from IETF IP model RFC 7277]
+                      The length of the subnet prefix.";
+	      }
+	      leaf port-number {
+		type uint16;
+		description
+		  "port of protected traffic";
+	      }
+	    }
+	    leaf upper-protocol {
+	      type transport-protocol-name-t;
+	      mandatory true;
+	      description
+		"Upper-layer protocol to be used";
+	    }
+	    leaf direction {
+	      type ipsec-traffic-direction;
+	      mandatory true;
+	      description
+		"It indicates whether the SA is inbound SA or
+                    out bound SA.";
+	    }
+	    leaf security-protocol {
+	      type ipsec-protocol;
+	      mandatory true;
+	      description
+		"Security protocol of IPsec SA: Either AH or ESP.";
+	    }
+	    leaf priority {
+	      type int32;
+	      mandatory true;
+	      description
+		"Priority of SPD entries";
+	    }
+	    leaf policy {
+	      type spd-policy;
+	      mandatory true;
+	      description
+		"Policy of SPD entries";
+	    }
+	  }
+	  description
+	    "SPD entories";
+	}
+      }
+    }
+    description "";
+  }
+
+} /* module ericsson-ipsec */
+

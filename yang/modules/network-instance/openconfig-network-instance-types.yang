@@ -114,9 +114,9 @@ module openconfig-network-instance-types {
 	  "Lagopus match-action tables";
       }
     }
-     description
-       "A base identity which can be extended to indicate different
-       types of network instance supported by a device.";
+    description
+      "A base identity which can be extended to indicate different
+      types of network instance supported by a device.";
   }
 
   // rjs note:

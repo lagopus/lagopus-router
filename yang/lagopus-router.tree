@@ -1,88 +1,208 @@
 module: lagopus-router
-    +--rw network-instances
-    |  +--rw network-instance* [name]
-    |     +--rw name          string
-    |     +--rw fdb
-    |     |  +--rw config
-    |     |     +--rw mac-learning?      boolean
-    |     |     +--rw mac-aging-time?    uint16
-    |     |     +--rw maximum-entries?   uint16
-    |     +--rw config
-    |     |  +--rw type?                       oc-ni-types:NETWORK_INSTANCE_TYPE
-    |     |  +--rw enabled?                    boolean
-    |     |  +--rw description?                string
-    |     |  +--rw router-id?                  yang:dotted-quad
-    |     |  +--rw route-distinguisher?        oc-ni-types:route-distinguisher
-    |     |  +--rw enabled-address-families*   octypes:ADDRESS_FAMILY
-    |     +--rw interfaces
-    |     |  +--rw interface* [name]
-    |     |     +--rw name            string
-    |     |     +--rw subinterface* [index]
-    |     |        +--rw index    uint32
-    |     +--rw vlans
-    |        +--rw vlan* [vlan-id]
-    |           +--rw vlan-id    oc-vlan-types:vlan-id
-    |           +--rw config
-    |              +--rw name?     string
-    |              +--rw status?   enumeration
-    +--rw interfaces
-       +--rw interface* [name]
-          +--rw name             string
-          +--rw config
-          |  +--rw type           iana-if-type:iana-if-type
-          |  +--rw mtu?           uint16
-          |  +--rw description?   string
-          |  +--rw enabled?       boolean
-          |  +--rw driver?        enumeration
-          |  +--rw device?        string
-          +--rw subinterfaces
-          |  +--rw subinterface* [index]
-          |     +--rw index     uint32
-          |     +--rw config
-          |     |  +--rw description?   string
-          |     |  +--rw enabled?       boolean
-          |     +--rw ipv4
-          |     |  +--rw addresses
-          |     |  |  +--rw address* [ip]
-          |     |  |     +--rw ip        inet:ipv4-address-no-zone
-          |     |  |     +--rw config
-          |     |  |     |  +--rw prefix-length?   uint8
-          |     |  |     +--rw vrrp
-          |     |  |        +--rw vrrp-group* [virtual-router-id]
-          |     |  |           +--rw virtual-router-id     uint8
-          |     |  |           +--rw config
-          |     |  |           |  +--rw virtual-address*          inet:ipv4-address
-          |     |  |           |  +--rw priority?                 uint8
-          |     |  |           |  +--rw preempt?                  boolean
-          |     |  |           |  +--rw preempt-delay?            uint16
-          |     |  |           |  +--rw accept-mode?              boolean
-          |     |  |           |  +--rw advertisement-interval?   uint16
-          |     |  |           +--rw interface-tracking
-          |     |  |              +--rw config
-          |     |  |                 +--rw track-interface?      string
-          |     |  |                 +--rw priority-decrement?   uint8
-          |     |  +--rw config
-          |     |     +--rw enabled?   boolean
-          |     |     +--rw mtu?       uint16
-          |     +--rw vlan
-          |     |  +--rw config
-          |     |     +--rw vlan-id?   oc-vlan-types:vlan-id
-          |     +--rw tunnel
-          |        +--rw config
-          |           +--rw address-type?          octypes:ADDRESS_FAMILY
-          |           +--rw local-inet-address?    inet:ipv4-address-no-zone
-          |           +--rw remote-inet-address?   inet:ipv4-address-no-zone
-          |           +--rw encaps-method?         ENCAPSMETHOD
-          |           +--rw hop-limit?             uint8
-          |           +--rw security?              TUNNELSECURITY
-          |           +--rw tos?                   int8
-          +--rw ethernet
-             +--rw config
-             |  +--rw mac-address?   yang:mac-address
-             +--rw switched-vlan
-                +--rw config
-                   +--rw interface-mode?   oc-vlan-types:vlan-mode-type
-                   +--rw native-vlan?      oc-vlan-types:vlan-id
-                   +--rw access-vlan?      oc-vlan-types:vlan-id
-                   +--rw trunk-vlans* [vlan-id]
-                      +--rw vlan-id    oc-vlan-types:vlan-id
+  +--rw network-instances
+  |  +--rw network-instance* [name]
+  |     +--rw name           string
+  |     +--rw fdb
+  |     |  +--rw config
+  |     |     +--rw mac-learning?      boolean
+  |     |     +--rw mac-aging-time?    uint16
+  |     |     +--rw maximum-entries?   uint16
+  |     +--rw config
+  |     |  +--rw type?                       oc-ni-types:NETWORK_INSTANCE_TYPE
+  |     |  +--rw enabled                     boolean
+  |     |  +--rw description?                string
+  |     |  +--rw router-id?                  yang:dotted-quad
+  |     |  +--rw route-distinguisher?        oc-ni-types:route-distinguisher
+  |     |  +--rw enabled-address-families*   octypes:ADDRESS_FAMILY
+  |     +--rw interfaces
+  |     |  +--rw interface* [name]
+  |     |     +--rw name            string
+  |     |     +--rw subinterface* [index]
+  |     |        +--rw index    uint32
+  |     +--rw pbr-entries* [name]
+  |     |  +--rw name               string
+  |     |  +--rw priority?          uint32
+  |     |  +--rw description?       string
+  |     |  +--rw ipv4
+  |     |  |  +--rw config
+  |     |  |     +--rw source-address?        oc-inet:ipv4-prefix
+  |     |  |     +--rw destination-address?   oc-inet:ipv4-prefix
+  |     |  |     +--rw protocol?              oc-pkt-match-types:ip-protocol-type
+  |     |  +--rw ipv6
+  |     |  |  +--rw config
+  |     |  |     +--rw source-address?           oc-inet:ipv6-prefix
+  |     |  |     +--rw source-flow-label?        oc-inet:ipv6-flow-label
+  |     |  |     +--rw destination-address?      oc-inet:ipv6-prefix
+  |     |  |     +--rw destination-flow-label?   oc-inet:ipv6-flow-label
+  |     |  |     +--rw protocol?                 oc-pkt-match-types:ip-protocol-type
+  |     |  +--rw transport
+  |     |  |  +--rw config
+  |     |  |     +--rw source-port?        oc-pkt-match-types:port-num-range
+  |     |  |     +--rw destination-port?   oc-pkt-match-types:port-num-range
+  |     |  +--rw input-interface
+  |     |  |  +--rw interface* [name]
+  |     |  |     +--rw name            string
+  |     |  |     +--rw subinterface* [index]
+  |     |  |        +--rw index    uint32
+  |     |  +--rw action
+  |     |     +--rw next-hops
+  |     |        +--rw next-hop* [index]
+  |     |           +--rw index               string
+  |     |           +--rw config
+  |     |           |  +--rw next-hop?   inet:ip-address
+  |     |           |  +--rw weight?     uint32
+  |     |           +--rw interface* [name]
+  |     |           |  +--rw name            string
+  |     |           |  +--rw subinterface* [index]
+  |     |           |     +--rw index    uint32
+  |     |           +--rw network-instance?   string
+  |     |           +--rw pass?               empty
+  |     +--rw vlans
+  |     |  +--rw vlan* [vlan-id]
+  |     |     +--rw vlan-id    oc-vlan-types:vlan-id
+  |     |     +--rw config
+  |     |        +--rw name?     string
+  |     |        +--rw status    enumeration
+  |     +--rw security
+  |        +--rw ipsec
+  |           +--rw sad
+  |           |  +--rw sad-entries* [spi]
+  |           |     +--rw spi       uint32
+  |           |     +--rw config
+  |           |        +--rw sa-mode           ipsec-mode
+  |           |        +--rw life-time
+  |           |        |  +--rw life-time-in-seconds?   uint32
+  |           |        |  +--rw life-time-in-byte?      uint32
+  |           |        +--rw local-peer
+  |           |        |  +--rw (ip-address)?
+  |           |        |     +--:(ipv4-address)
+  |           |        |        +--rw ipv4-address    inet:ipv4-address-no-zone
+  |           |        +--rw remote-peer
+  |           |        |  +--rw (ip-address)?
+  |           |        |     +--:(ipv4-address)
+  |           |        |        +--rw ipv4-address    inet:ipv4-address-no-zone
+  |           |        +--rw encap-protocol?   encap-protocol
+  |           |        +--rw encap-src-port?   uint16
+  |           |        +--rw encap-dst-port?   uint16
+  |           |        +--rw esp
+  |           |           +--rw authentication
+  |           |           |  +--rw (authentication-algorithm)
+  |           |           |     +--:(hmac-sha1-96)
+  |           |           |     |  +--rw hmac-sha1-96
+  |           |           |     |     +--rw key-str?   string
+  |           |           |     +--:(null)
+  |           |           |        +--rw null?           empty
+  |           |           +--rw encryption
+  |           |              +--rw (encryption-algorithm)
+  |           |                 +--:(aes-128-cbc)
+  |           |                 |  +--rw aes-128-cbc
+  |           |                 |     +--rw key-str?   string
+  |           |                 +--:(aes-128-gcm)
+  |           |                 |  +--rw aes-128-gcm
+  |           |                 |     +--rw key-str?   string
+  |           |                 +--:(null)
+  |           |                    +--rw null?          empty
+  |           +--rw spd
+  |              +--rw spd-entries* [name]
+  |                 +--rw name      string
+  |                 +--rw config
+  |                    +--rw description?           string
+  |                    +--rw spi                    uint32
+  |                    +--rw source-address
+  |                    |  +--rw (ip-address)?
+  |                    |  |  +--:(ipv4-address)
+  |                    |  |     +--rw ipv4-address    inet:ipv4-address-no-zone
+  |                    |  +--rw prefix-length?        uint8
+  |                    |  +--rw port-number?          uint16
+  |                    +--rw destination-address
+  |                    |  +--rw (ip-address)?
+  |                    |  |  +--:(ipv4-address)
+  |                    |  |     +--rw ipv4-address    inet:ipv4-address-no-zone
+  |                    |  +--rw prefix-length?        uint8
+  |                    |  +--rw port-number?          uint16
+  |                    +--rw upper-protocol         transport-protocol-name-t
+  |                    +--rw direction              ipsec-traffic-direction
+  |                    +--rw security-protocol      ipsec-protocol
+  |                    +--rw priority               int32
+  |                    +--rw policy                 spd-policy
+  +--rw interfaces
+     +--rw interface* [name]
+        +--rw name             string
+        +--rw config
+        |  +--rw type           iana-if-type:iana-if-type
+        |  +--rw mtu?           uint16
+        |  +--rw description?   string
+        |  +--rw enabled        boolean
+        |  +--rw driver?        enumeration
+        |  +--rw device?        string
+        +--rw subinterfaces
+        |  +--rw subinterface* [index]
+        |     +--rw index     uint32
+        |     +--rw config
+        |     |  +--rw description?   string
+        |     |  +--rw enabled        boolean
+        |     +--rw ipv4
+        |     |  +--rw addresses
+        |     |  |  +--rw address* [ip]
+        |     |  |     +--rw ip        inet:ipv4-address-no-zone
+        |     |  |     +--rw config
+        |     |  |     |  +--rw prefix-length?   uint8
+        |     |  |     +--rw vrrp
+        |     |  |        +--rw vrrp-group* [virtual-router-id]
+        |     |  |           +--rw virtual-router-id     uint8
+        |     |  |           +--rw config
+        |     |  |           |  +--rw virtual-address*          inet:ipv4-address
+        |     |  |           |  +--rw priority?                 uint8
+        |     |  |           |  +--rw preempt?                  boolean
+        |     |  |           |  +--rw preempt-delay?            uint16
+        |     |  |           |  +--rw accept-mode?              boolean
+        |     |  |           |  +--rw advertisement-interval?   uint16
+        |     |  |           +--rw interface-tracking
+        |     |  |              +--rw config
+        |     |  |                 +--rw track-interface?      string
+        |     |  |                 +--rw priority-decrement?   uint8
+        |     |  +--rw config
+        |     |  |  +--rw enabled?   boolean
+        |     |  +--rw napt
+        |     |     +--rw config
+        |     |        +--rw enabled?           boolean
+        |     |        +--rw maximum-entries?   uint16
+        |     |        +--rw aging-time?        uint32
+        |     |        +--rw port-range?        string
+        |     |        +--rw address?           inet:ipv4-address-no-zone
+        |     +--rw vlan
+        |     |  +--rw config
+        |     |     +--rw vlan-id?   oc-vlan-types:vlan-id
+        |     +--rw tunnel
+        |        +--rw config
+        |           +--rw address-type?          octypes:ADDRESS_FAMILY
+        |           +--rw local-inet-address?    inet:ipv4-address-no-zone
+        |           +--rw remote-inet-address* [address]
+        |           |  +--rw address    inet:ipv4-address-no-zone
+        |           +--rw hop-limit?             uint8
+        |           +--rw network-instance?      string
+        |           +--rw encaps-method          ENCAPSMETHOD
+        |           +--rw security?              TUNNELSECURITY
+        |           +--rw tos?                   int8
+        +--rw ethernet
+        |  +--rw config
+        |  |  +--rw mac-address?   yang:mac-address
+        |  +--rw switched-vlan
+        |     +--rw config
+        |        +--rw interface-mode?   oc-vlan-types:vlan-mode-type
+        |        +--rw native-vlan?      oc-vlan-types:vlan-id
+        |        +--rw access-vlan?      oc-vlan-types:vlan-id
+        |        +--rw trunk-vlans* [vlan-id]
+        |           +--rw vlan-id    oc-vlan-types:vlan-id
+        +--rw tunnel
+           +--rw config
+              +--rw address-type?          octypes:ADDRESS_FAMILY
+              +--rw local-inet-address?    inet:ipv4-address-no-zone
+              +--rw remote-inet-address* [address]
+              |  +--rw address    inet:ipv4-address-no-zone
+              +--rw hop-limit?             uint8
+              +--rw network-instance?      string
+              +--rw encaps-method          L2ENCAPSMETHOD
+              +--rw tos?                   uint8
+              +--rw vxlan
+                 +--rw vni?   uint32

@@ -1,0 +1,191 @@
+module lagopus-policy-based-routing {
+  yang-version "1";
+
+  // namespace
+  namespace "http://lagopus.org/yang/policy-based-routing";
+
+  prefix "lago-pbr";
+
+  import openconfig-packet-match { prefix "oc-match"; }
+  import openconfig-inet-types {prefix "inet"; }
+
+  // include submodules
+
+
+  // meta
+  organization "Lagopus project";
+
+  contact
+    "Lagopus project
+    www.lagopu.org";
+
+  description
+    "Groupings for Policy Based Routing";
+
+  revision "2017-12-11" {
+    description
+      "Refactoring for beta version";
+    reference "0.1.0";
+  }
+
+
+  // grouping statements
+
+  // input interface
+  grouping input-interface-top {
+    description
+      "Input interface top level container";
+
+    container input-interface {
+      description
+        "Input interface container";
+
+      list interface {
+	key "name";
+	description "";
+
+	leaf name {
+	  type string;
+	  description "";
+	}
+
+	list subinterface {
+	  key "index";
+	  description	"";
+	  leaf index {
+	    type uint32;
+	    description "";
+	  }
+	}
+      }
+    }
+  }
+
+  grouping local-static-nexthop-config {
+    description
+      "Configuration parameters related to each next-hop entry
+      specified for a static route";
+
+    leaf next-hop {
+      type inet:ip-address;
+      description
+        "The next-hop that is to be used for the static route
+        - this may be specified as an IP address, an interface
+        or a pre-defined next-hop type - for instance, DROP or
+        LOCAL_LINK. When this leaf is not set, and the interface-ref
+        value is specified for the next-hop, then the system should
+        treat the prefix as though it is directly connected to the
+        interface.";
+    }
+
+    leaf weight {
+      type uint32 {
+	range "1..4294967295";
+      }
+      description "";
+    }
+  }
+  
+  grouping nexthops-grouping {
+    description "";
+    container next-hops {
+      description
+	"Configuration and state parameters relating to the
+        next-hops that are to be utilised for the static
+        route being specified";
+      
+      list next-hop {
+	key "index";
+
+	description
+	  "A list of next-hops to be utilised for the static
+          route being specified.";
+	
+	leaf index {
+	  type string;
+	  description
+	    "An user-specified identifier utilised to uniquely reference
+            the next-hop entry in the next-hop list. The value of this
+            index has no semantic meaning other than for referencing
+            the entry.";
+	}
+	
+	container config {
+	  description
+	    "Configuration parameters relating to the next-hop
+            entry";
+	  
+	  uses local-static-nexthop-config;
+	}
+	
+	list interface {
+          key "name";
+	  description "";
+
+	  leaf name {
+	    type string;
+	    description "";
+	  }
+
+	  list subinterface {
+	    key "index";
+	    description	"";
+	    leaf index {
+	      type uint32;
+	      description "";
+	    }
+	  }
+	}
+	leaf network-instance {
+	  type string;
+	  description "";
+	}
+	leaf pass {
+	  type empty;
+	  description "";
+	}
+      }
+    }
+  }
+    
+    
+    
+  grouping pbr-action {
+    description "";
+    container action {
+      description "";
+      uses nexthops-grouping;
+    }
+  }
+  
+  grouping pbr-entry-config {
+    description "";
+    leaf priority {
+      type uint32;
+      description "";
+    }
+    leaf description {
+      type string;
+      description "";
+    }
+    uses oc-match:ipv4-protocol-fields-top;
+    uses oc-match:ipv6-protocol-fields-top;
+    uses oc-match:transport-fields-top;
+    uses input-interface-top;
+    uses pbr-action;
+  }
+
+  grouping pbr-entries-top {
+    description "";
+    list pbr-entries {
+      key "name";
+      description "";
+      leaf name {
+	type string;
+	description "";
+      }
+      uses pbr-entry-config;
+    }
+  }
+  
+}
