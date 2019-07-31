@@ -55,25 +55,6 @@ module openconfig-if-ip {
          connected to an IPv4 stack, and the interface can send
          and receive IPv4 packets.";
     }
-
-    leaf mtu {
-     type uint16 {
-       range "68..max";
-     }
-     units octets;
-     description
-       "The size, in octets, of the largest IPv4 packet that the
-        interface will send and receive.
-
-        The server may restrict the allowed values for this leaf,
-        depending on the interface's type.
-
-        If this leaf is not configured, the operationally used MTU
-        depends on the interface's type.";
-     reference
-       "RFC 791: Internet Protocol";
-    }
-
   }
 
   grouping ipv4-address-config {
@@ -84,10 +65,10 @@ module openconfig-if-ip {
 
     leaf prefix-length {
       type uint8 {
-       range "0..32";
+	range "0..32";
       }
       description
-       "[adapted from IETF IP model RFC 7277]
+	"[adapted from IETF IP model RFC 7277]
 
        The length of the subnet prefix.";
     }
@@ -251,12 +232,12 @@ module openconfig-if-ip {
         list address {
           key "ip";
           description
-           "The list of configured IPv4 addresses on the interface.";
+	    "The list of configured IPv4 addresses on the interface.";
 
-        leaf ip {
-          type inet:ipv4-address-no-zone;
-          description
-            "[adapted from IETF IP model RFC 7277]
+	  leaf ip {
+	    type inet:ipv4-address-no-zone;
+	    description
+	      "[adapted from IETF IP model RFC 7277]
 
             The IPv4 address on the interface.";
           }

@@ -13,7 +13,9 @@ module lagopus-router {
   import openconfig-if-ip { prefix "oc-ip"; }
   import openconfig-if-ethernet { prefix "oc-eth"; }
 
-  import lagopus-ip-tunnel {prefix "lago-tunnel"; }
+  import ietf-ipsec { prefix "ipsec"; }
+  import lagopus-tunnel { prefix "lago-tunnel"; }
+  import lagopus-nat { prefix "lago-nat"; }
 
   organization "Lagopus project";
 
@@ -50,7 +52,18 @@ module lagopus-router {
   uses oc-netinst:network-instance-top;
   uses oc-if:interfaces-top;
 
+
   // augment statements
+
+
+  augment "/lago:network-instances/lago:network-instance" {
+    description "";
+    container security {
+      description "";
+      uses ipsec:ipsec-top;
+    }
+  }
+
 
   // Augment for ethernet
 
@@ -126,6 +139,12 @@ module lagopus-router {
 
   }
 
+  augment "/lago:interfaces/lago:interface/lago:subinterfaces/" +
+    "lago:subinterface/lago:ipv4" {
+    description "";
+    uses lago-nat:napt-top;
+  }
+
   // IPtunnel
 
   augment "/lago:interfaces/lago:interface/lago:subinterfaces/" +
@@ -134,6 +153,14 @@ module lagopus-router {
    description "";
 
    uses lago-tunnel:tunnel-top;
+  }
+
+  // L2tunnel
+
+  augment "/lago:interfaces/lago:interface" {
+
+   description "";
+   uses lago-tunnel:l2-tunnel-top;
   }
 
   // rpc statements

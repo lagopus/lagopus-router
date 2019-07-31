@@ -1,0 +1,72 @@
+module lagopus-nat {
+
+  yang-version "1";
+
+  // namespace
+  namespace "http://lagopus.org/yang/nat";
+
+  prefix "lago-nat";
+
+  import ietf-inet-types { prefix inet; }
+
+  // include submodules
+
+  // meta
+  organization "Lagopus project";
+
+  contact
+    "Lagopus project
+    www.lagopu.org";
+
+  description
+    "Groupings for Policy Based Routing";
+
+  revision "2019-01-09" {
+    description
+      "Initial commit";
+    reference "0.1.0";
+  }
+
+  // grouping statements
+
+
+  grouping napt-config {
+    description "";
+    leaf enabled {
+      type boolean;
+      description "";
+    }
+    leaf maximum-entries {
+      type uint16;
+      description "";
+    }
+    leaf aging-time {
+      type uint32;
+      description "";
+    }
+    leaf port-range {
+      type string {
+        pattern '^(6[0-5][0-5][0-3][0-5]|[0-5]?[0-9]?[0-9]?[0-9]?' +
+          '[0-9]?)\.\.(6[0-5][0-5][0-3][0-5]|[0-5]?[0-9]?[0-9]?' +
+          '[0-9]?[0-9]?)$';
+      }
+      description "";
+    }
+    leaf address {
+      type inet:ipv4-address-no-zone;
+      description "";
+    }
+  }
+  
+  grouping napt-top {
+    description "";
+
+    container napt {
+      description "";
+      container config {
+	description "";
+	uses napt-config;
+      }
+    }
+  }
+}
